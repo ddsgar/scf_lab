@@ -1,5 +1,5 @@
-from collections import deque
 import time
+import random
 
 class TreeNode:
     def __init__(self, value):
@@ -7,40 +7,48 @@ class TreeNode:
         self.left = None
         self.right = None
 
-def createNode(value):
-    return TreeNode(value)
+def create_random_array(size, range_min, range_max):
+    # Shuffle indices first
+    indices = list(range(range_min, range_max + 1))
+    random.shuffle(indices)
 
-def generatePerfectBinaryTree(depth):
-    if depth <= 0:
+    # Create an array with the shuffled indices
+    return indices[:size]
+
+def generate_perfect_binary_tree_from_array(arr):
+    def build_tree(arr):
+        if not arr:
+            return None
+        mid = len(arr) // 2
+        node = TreeNode(arr[mid])
+        node.left = build_tree(arr[:mid])
+        node.right = build_tree(arr[mid + 1:])
+        return node
+
+    return build_tree(arr)
+
+def generate_perfect_binary_tree(num_nodes):
+    if num_nodes <= 0:
         return None
 
-    root = createNode(1)
-    q = [root]  # Use a list instead of deque for faster operations
+    num_internal_nodes = num_nodes - 1  # Subtracting 1 for the root node
+    depth = 0
 
-    level = 1
-    while q and level < depth:
-        node_count = len(q)
+    # Determine the depth iteratively
+    while True:
+        if 2**depth > num_internal_nodes:
+            break
+        depth += 1
 
-        for _ in range(node_count):
-            node = q.pop(0)  # Pop from the beginning for faster removal
+    arr = create_random_array(2**depth - 1, 0, num_nodes)
+    return generate_perfect_binary_tree_from_array(arr)
 
-            node.left = createNode(node.data << 1)  # Use bitwise shift for faster calculations
-            q.append(node.left)
-
-            if level < depth - 1:
-                node.right = createNode((node.data << 1) + 1)
-                q.append(node.right)
-
-        level += 1
-
-    return root
-
-depth = int(input())
+num_nodes = int(input())
 time_start = time.time()
-root = generatePerfectBinaryTree(depth)
+root = generate_perfect_binary_tree(num_nodes)
 
 # Output tree for verification
-def print_tree(root):
+def print_tree(root, depth):
     nodes = [(root, 0)]
     while nodes:
         node, level = nodes.pop()
@@ -50,7 +58,9 @@ def print_tree(root):
             nodes.append((node.left, level + 1))
 
 with open('input_tree.txt', 'w') as file:
-    for level in range(depth):
+    print_tree(root, int(2 * num_nodes - 2))
+
+    for level in range(int(2 * num_nodes - 2)):
         nodes_at_level = [(root, 0)]
         while nodes_at_level:
             node, current_level = nodes_at_level.pop()
