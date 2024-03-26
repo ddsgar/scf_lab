@@ -1,15 +1,15 @@
 import queue
 import time
 
+def createNode(value, depth):
+    return TreeNode(value, depth)
+
 class TreeNode:
-    def __init__(self, value):
+    def __init__(self, value, depth=0):
         self.data = value
+        self.depth = depth
         self.left = None
         self.right = None
-
-
-def createNode(value):
-    return TreeNode(value)
 
 
 def freeTree(node):
@@ -63,25 +63,23 @@ def countNodesAtEachLevel(root):
     return result
 
 
-def createTreeFromFile(filename):
-    root = None
-    nodesStack = []
-    with open(filename, 'r') as file:
-        for line in file:
-            value, depth = map(int, line.strip().split())
-            node = createNode(value)
-            while nodesStack and nodesStack[-1][1] >= depth:
-                nodesStack.pop()
-            if not nodesStack:
-                root = node
-            else:
-                parent = nodesStack[-1][0]
-                if not parent.left:
-                    parent.left = node
-                else:
-                    parent.right = node
-            nodesStack.append((node, depth))
-    return root
+def createTreeFromArray(values, depth):
+    if not values:
+        return None
+
+    if len(values) == 1:
+        return createNode(values[0][0], values[0][1])
+
+    mid_val = len(values) // 2
+    if values[mid_val][1] < depth:
+        return None
+
+    node = createNode(values[mid_val][0], values[mid_val][1])
+
+    node.left = createTreeFromArray(values[:mid_val], depth + 1)
+    node.right = createTreeFromArray(values[mid_val + 1:], depth + 1)
+
+    return node
 
 
 def writeTreeToFile(root, filename):
@@ -97,16 +95,21 @@ def writeTreeToFileHelper(node, file, depth):
     writeTreeToFileHelper(node.left, file, depth + 1)
 
 
-# Пример использования:
-#root = createTreeFromFile("example.txt")
-root = createTreeFromFile("input_tree.txt")
+# Example usage:
+#values = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+#root = createTreeFromArray(values)
+with open("input_tree.txt", 'r') as file:
+    values = [(int(line.split()[0]), int(line.split()[1])) for line in file.readlines()]
+
+root = createTreeFromArray(values, 0)
 
 time_start = time.time()
 levels_count = countNodesAtEachLevel(root)
-
-print("Количество вершин на каждом уровне дерева:")
-for level, count in enumerate(levels_count):
-    print(f"Уровень {level}: {count} вершин")
 time_end = time.time()
+
+print("Number of nodes on each level of the tree:")
+for level, count in enumerate(levels_count):
+    print(f"Level {level}: {count} nodes")
+
+
 print(time_end - time_start)
-writeTreeToFile(root, "output_tree.txt")
