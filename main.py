@@ -12,14 +12,6 @@ class TreeNode:
         self.right = None
 
 
-def freeTree(node):
-    if node is None:
-        return
-    freeTree(node.left)
-    freeTree(node.right)
-    del node
-
-
 def printTree(root, space=0):
     if root is None:
         return
@@ -29,17 +21,6 @@ def printTree(root, space=0):
         print("---- ", end="")
     print(root.data)
     printTree(root.left, space + 4)
-
-
-def insert(root, value):
-    if root is None:
-        return createNode(value)
-    if value < root.data:
-        root.left = insert(root.left, value)
-    elif value > root.data:
-        root.right = insert(root.right, value)
-    return root
-
 
 def countNodesAtEachLevel(root):
     if root is None:
@@ -82,23 +63,7 @@ def createTreeFromArray(values, depth):
     return node
 
 
-def writeTreeToFile(root, filename):
-    with open(filename, 'w') as file:
-        writeTreeToFileHelper(root, file, 0)
-
-
-def writeTreeToFileHelper(node, file, depth):
-    if node is None:
-        return
-    writeTreeToFileHelper(node.right, file, depth + 1)
-    file.write(f"{node.data} {depth}\n")
-    writeTreeToFileHelper(node.left, file, depth + 1)
-
-
-# Example usage:
-#values = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-#root = createTreeFromArray(values)
-with open("input_tree.txt", 'r') as file:
+with open(input(), 'r') as file:
     values = [(int(line.split()[0]), int(line.split()[1])) for line in file.readlines()]
 
 root = createTreeFromArray(values, 0)
@@ -107,9 +72,8 @@ time_start = time.time()
 levels_count = countNodesAtEachLevel(root)
 time_end = time.time()
 
-print("Number of nodes on each level of the tree:")
+
 for level, count in enumerate(levels_count):
     print(f"Level {level}: {count} nodes")
-
 
 print(time_end - time_start)
