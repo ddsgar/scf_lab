@@ -57,8 +57,8 @@ def print_tree(root, depth):
             nodes.append((node.right, level + 1))
             nodes.append((node.left, level + 1))
 
-with open('input_tree.txt', 'w') as file:
-    print_tree(root, int(2 * num_nodes - 2))
+with open('input_1_000_000.txt', 'w') as file:
+    #print_tree(root, int(2 * num_nodes - 2))
 
     for level in range(int(2 * num_nodes - 2)):
         nodes_at_level = [(root, 0)]
